@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <title>Ludo King - Icon Generator</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: radial-gradient(ellipse at top, #1a0033, #0a0015, #000);
+      color: #ffcc00;
+      font-family: 'Courier New', monospace;
+      min-height: 100vh;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 32px;
+      letter-spacing: 4px;
+      color: #ffcc00;
+      text-shadow: 0 0 20px #ffcc00, 0 0 40px #ffcc00;
+      margin-bottom: 8px;
+      margin-top: 10px;
+    }
+
+    .subtitle {
+      font-size: 12px;
+      color: #888;
+      letter-spacing: 3px;
+      margin-bottom: 25px;
+    }
+
+    .config-box {
+      background: rgba(255,204,0,0.08);
+      border: 2px solid #ffcc0055;
+      border-radius: 12px;
+      padding: 16px;
+      max-width: 500px;
+      margin: 0 auto 20px;
+      text-align: left;
+    }
+
+    .config-box h3 {
+      color: #ffcc00;
+      font-size: 14px;
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+    }
+
+    .config-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .config-row label {
+      flex: 1;
+      font-size: 12px;
+      color: #ccc;
+    }
+
+    .config-row input[type="text"] {
+      flex: 2;
+      background: #1a0033;
+      border: 1px solid #ffcc0055;
+      color: #ffcc00;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .config-row input[type="text"]:focus {
+      border-color: #ffcc00;
+      box-shadow: 0 0 10px #ffcc0066;
+    }
+
+    .emoji-picker {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .emoji-btn {
+      background: #1a0033;
+      border: 2px solid #ffcc0055;
+      color: #fff;
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 22px;
+      transition: all 0.15s;
+    }
+
+    .emoji-btn:active,
+    .emoji-btn.active {
+      background: #ffcc00;
+      border-color: #ffcc00;
+      transform: scale(1.1);
+    }
+
+    .color-picker {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .color-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s;
+      box-shadow: 0 0 8px rgba(0,0,0,0.5);
+    }
+
+    .color-btn.active {
+      border-color: #fff;
+      transform: scale(1.15);
+      box-shadow: 0 0 15px currentColor;
+    }
+
+    .btn-generate {
+      background: linear-gradient(135deg, #ffcc00, #cc8800);
+      color: #1a0033;
+      border: none;
+      padding: 16px 40px;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 3px;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 6px 0 #886600, 0 10px 30px rgba(255,204,0,0.5);
+      transition: all 0.1s;
+      margin: 20px 0;
+    }
+
+    .btn-generate:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 #886600, 0 4px 20px rgba(255,204,0,0.5);
+    }
+
+    .btn-generate:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .previews {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .preview {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid #ffcc0033;
+      border-radius: 10px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      min-width: 90px;
+    }
+
+    .preview canvas {
+      display: block;
+      background: transparent;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+
+    .preview .label {
+      font-size: 9px;
+      color: #ffcc00;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      text-align: center;
+      max-width: 100px;
+      word-break: break-all;
+    }
+
+    .preview .size {
+      font-size: 8px;
+      color: #888;
+    }
+
+    .status {
+      margin-top: 15px;
+      font-size: 13px;
+      color: #4ade80;
+      min-height: 20px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .footer {
+      margin-top: 30px;
+      font-size: 11px;
+      color: #666;
+      letter-spacing: 1px;
+      line-height: 1.8;
+    }
+
+    .footer a {
+      color: #ffcc00;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎲 ICON GENERATOR</h1>
+  <p class="subtitle">LUDO KING PREMIUM</p>
+
+  <div class="config-box">
+    <h3>⚙️ SETTINGS</h3>
+
+    <div class="config-row">
+      <label>🎯 Emoji:</label>
+      <input type="text" id="emojiInput" value="🎲" maxlength="2" style="max-width: 60px; text-align: center;">
+    </div>
+
+    <div class="emoji-picker" id="emojiPicker">
+      <button class="emoji-btn active" data-emoji="🎲">🎲</button>
+      <button class="emoji-btn" data-emoji="👑">👑</button>
+      <button class="emoji-btn" data-emoji="🏆">🏆</button>
+      <button class="emoji-btn" data-emoji="🎯">🎯</button>
+      <button class="emoji-btn" data-emoji="🎮">🎮</button>
+      <button class="emoji-btn" data-emoji="🔴">🔴</button>
+      <button class="emoji-btn" data-emoji="🎰">🎰</button>
+      <button class="emoji-btn" data-emoji="⭐">⭐</button>
+    </div>
+
+    <div class="config-row" style="margin-top: 15px;">
+      <label>🎨 Background:</label>
+    </div>
+    <div class="color-picker" id="bgPicker">
+      <button class="color-btn active" data-color="#1a0033" style="background:#1a0033"></button>
+      <button class="color-btn" data-color="#000000" style="background:#000000"></button>
+      <button class="color-btn" data-color="#0f380f" style="background:#0f380f"></button>
+      <button class="color-btn" data-color="#1a1a1a" style="background:#1a1a1a"></button>
+      <button class="color-btn" data-color="#2a0a1a" style="background:#2a0a1a"></button>
+      <button class="color-btn" data-color="#0a1a3a" style="background:#0a1a3a"></button>
+    </div>
+
+    <div class="config-row" style="margin-top: 15px;">
+      <label>🔵 Circle Color:</label>
+    </div>
+    <div class="color-picker" id="circlePicker">
+      <button class="color-btn active" data-color="#ffcc00" style="background:#ffcc00"></button>
+      <button class="color-btn" data-color="#e63946" style="background:#e63946"></button>
+      <button class="color-btn" data-color="#06d6a0" style="background:#06d6a0"></button>
+      <button class="color-btn" data-color="#4cc9f0" style="background:#4cc9f0"></button>
+      <button class="color-btn" data-color="#ffffff" style="background:#ffffff"></button>
+      <button class="color-btn" data-color="#ff69b4" style="background:#ff69b4"></button>
+    </div>
+  </div>
+
+  <button class="btn-generate" id="generateBtn">
+    📥 GENERATE ALL ICONS
+  </button>
+
+  <div class="status" id="status"></div>
+
+  <div class="previews" id="previews"></div>
+
+  <div class="footer">
+    <p>💡 <b>টিপস:</b> নিচের আইকনগুলো ডাউনলোড হবে:</p>
+    <p>favicon.ico · favicon.svg · favicon-96x96.png</p>
+    <p>apple-touch-icon.png · web-app-manifest-192x192.png · web-app-manifest-512x512.png</p>
+    <p style="margin-top: 10px;">📁 সব ফাইল একই ফোল্ডারে রাখো (index.html এর পাশে)</p>
+  </div>
+
+  <script>
+    // ===== কনফিগারেশন =====
+    const CONFIG = {
+      emoji: '🎲',
+      bg: '#1a0033',
+      circle: '#ffcc00'
+    };
+
+    // ===== সাইজ লিস্ট =====
+    const SIZES = [
+      { size: 16,   name: 'favicon-16x16.png',                preview: 64 },
+      { size: 32,   name: 'favicon-32x32.png',                preview: 64 },
+      { size: 48,   name: 'favicon-48x48.png',                preview: 64 },
+      { size: 96,   name: 'favicon-96x96.png',                preview: 96 },
+      { size: 180,  name: 'apple-touch-icon.png',             preview: 96 },
+      { size: 192,  name: 'web-app-manifest-192x192.png',     preview: 96 },
+      { size: 512,  name: 'web-app-manifest-512x512.png',     preview: 96 }
+    ];
+
+    // ===== ক্যানভাসে আইকন আঁকা =====
+    function drawIcon(canvas, size) {
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+
+      // স্কুয়ার রাউন্ড কর্নার (কিছুটা হলেও)
+      const radius = size * 0.18;
+
+      // ব্যাকগ্রাউন্ড
+      ctx.beginPath();
+      roundRect(ctx, 0, 0, size, size, radius);
+      ctx.fillStyle = CONFIG.bg;
+      ctx.fill();
+
+      // ভেতরে গোল
+      ctx.beginPath();
+      ctx.arc(size / 2, size / 2, size * 0.40, 0, Math.PI * 2);
+      ctx.fillStyle = CONFIG.circle;
+      ctx.fill();
+
+      // গোলের ভিতরে হালকা ছায়া / হাইলাইট
+      const grad = ctx.createRadialGradient(
+        size / 2 - size * 0.1, size / 2 - size * 0.1, size * 0.05,
+        size / 2, size / 2, size * 0.42
+      );
+      grad.addColorStop(0, 'rgba(255,255,255,0.4)');
+      grad.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.beginPath();
+      ctx.arc(size / 2, size / 2, size * 0.40, 0, Math.PI * 2);
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // গোলের বর্ডার
+      ctx.beginPath();
+      ctx.arc(size / 2, size / 2, size * 0.40, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+      ctx.lineWidth = Math.max(1, size * 0.02);
+      ctx.stroke();
+
+      // ইমোজি
+      const emojiSize = size * 0.55;
+      ctx.font = emojiSize + 'px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#000';
+      ctx.fillText(CONFIG.emoji, size / 2, size / 2 + size * 0.04);
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+    }
+
+    // ===== প্রিভিউ আপডেট =====
+    function renderPreviews() {
+      const previews = document.getElementById('previews');
+      previews.innerHTML = '';
+
+      SIZES.forEach(s => {
+        const div = document.createElement('div');
+        div.className = 'preview';
+
+        const canvas = document.createElement('canvas');
+        drawIcon(canvas, s.size);
+        canvas.style.width = s.preview + 'px';
+        canvas.style.height = s.preview + 'px';
+
+        const label = document.createElement('div');
+        label.className = 'label';
+        label.textContent = s.name.replace('.png', '');
+
+        const size = document.createElement('div');
+        size.className = 'size';
+        size.textContent = s.size + '×' + s.size;
+
+        div.appendChild(canvas);
+        div.appendChild(label);
+        div.appendChild(size);
+        previews.appendChild(div);
+      });
+    }
+
+    // ===== ডাউনলোড =====
+    function download(blob, filename) {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    }
+
+    async function generateAll() {
+      const btn = document.getElementById('generateBtn');
+      const status = document.getElementById('status');
+      btn.disabled = true;
+      status.textContent = '⏳ তৈরি হচ্ছে...';
+
+      // সব PNG
+      for (let i = 0; i < SIZES.length; i++) {
+        const s = SIZES[i];
+        status.textContent = `⏳ ${s.name} (${i+1}/${SIZES.length + 2})`;
+
+        const canvas = document.createElement('canvas');
+        drawIcon(canvas, s.size);
+
+        await new Promise(res => {
+          canvas.toBlob(blob => {
+            download(blob, s.name);
+            setTimeout(res, 250);
+          }, 'image/png');
+        });
+      }
+
+      // SVG
+      status.textContent = '⏳ favicon.svg...';
+      await new Promise(res => setTimeout(res, 300));
+      downloadSVG();
+
+      // ICO
+      status.textContent = '⏳ favicon.ico...';
+      await new Promise(res => setTimeout(res, 300));
+      downloadICO();
+
+      // শেষ
+      status.textContent = '✅ সব ফাইল ডাউনলোড হয়েছে!';
+      btn.disabled = false;
+
+      setTimeout(() => {
+        status.textContent = '📁 সব ফাইল প্রজেক্ট ফোল্ডারে রাখো';
+      }, 3000);
+    }
+
+    function downloadSVG() {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="90" ry="90" fill="${CONFIG.bg}"/>
+  <circle cx="256" cy="256" r="205" fill="${CONFIG.circle}"/>
+  <circle cx="256" cy="256" r="205" fill="url(#g)" opacity="0.4"/>
+  <defs>
+    <radialGradient id="g" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <text x="256" y="340" font-size="280" text-anchor="middle" font-family="Apple Color Emoji, Segoe UI Emoji, Arial">${CONFIG.emoji}</text>
+</svg>`;
+      const blob = new Blob([svg], { type: 'image/svg+xml' });
+      download(blob, 'favicon.svg');
+    }
+
+    function downloadICO() {
+      // 32x32 PNG কে .ico নামে সেভ (ব্রাউজার সাপোর্ট করে)
+      const canvas = document.createElement('canvas');
+      drawIcon(canvas, 32);
+      canvas.toBlob(blob => {
+        download(blob, 'favicon.ico');
+      }, 'image/png');
+    }
+
+    // ===== UI ইভেন্ট =====
+    document.getElementById('emojiPicker').addEventListener('click', e => {
+      if (!e.target.classList.contains('emoji-btn')) return;
+      document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      CONFIG.emoji = e.target.dataset.emoji;
+      document.getElementById('emojiInput').value = CONFIG.emoji;
+      renderPreviews();
+    });
+
+    document.getElementById('emojiInput').addEventListener('input', e => {
+      const val = e.target.value.trim() || '🎲';
+      CONFIG.emoji = val;
+      document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('active'));
+      renderPreviews();
+    });
+
+    document.getElementById('bgPicker').addEventListener('click', e => {
+      if (!e.target.classList.contains('color-btn')) return;
+      document.querySelectorAll('#bgPicker .color-btn').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      CONFIG.bg = e.target.dataset.color;
+      renderPreviews();
+    });
+
+    document.getElementById('circlePicker').addEventListener('click', e => {
+      if (!e.target.classList.contains('color-btn')) return;
+      document.querySelectorAll('#circlePicker .color-btn').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      CONFIG.circle = e.target.dataset.color;
+      renderPreviews();
+    });
+
+    document.getElementById('generateBtn').addEventListener('click', generateAll);
+
+    // ===== ইনিশিয়ালাইজ =====
+    renderPreviews();
+  </script>
+
+</body>
+</html>
