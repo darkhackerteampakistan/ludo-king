@@ -1,4 +1,4 @@
-// ===== LUDO KING STYLE — Complete Game =====
+// ===== LUDO KING ULTIMATE =====
 (function() {
   'use strict';
 
@@ -9,6 +9,7 @@
   const ctx = canvas.getContext('2d');
 
   const menuScreen = $('menuScreen');
+  const customScreen = $('customScreen');
   const gameScreen = $('gameScreen');
   const winScreen = $('winScreen');
   const statusText = $('statusText');
@@ -17,84 +18,68 @@
   const diceFace = $('diceFace');
   const winTitle = $('winTitle');
   const winText = $('winText');
+  const winStats = $('winStats');
   const winConfetti = $('winConfetti');
+  const tokenPreview = $('tokenPreview');
 
   // ===== বোর্ড =====
   const GRID = 15;
   let CELL = 26;
   let W = 0, H = 0;
 
-  // ===== খেলোয়াড় =====
-  const PLAYERS = [
-    { id: 0, name: 'তুমি',  color: '#e63946', dark: '#9d1f2b', light: '#ff8a8a', emoji: '🔴' },
-    { id: 1, name: 'বট 1',  color: '#06d6a0', dark: '#048f6c', light: '#6eecb8', emoji: '🟢' },
-    { id: 2, name: 'বট 2',  color: '#ffd60a', dark: '#ccaa00', light: '#ffe680', emoji: '🟡' },
-    { id: 3, name: 'বট 3',  color: '#4cc9f0', dark: '#2596be', light: '#a5e4f7', emoji: '🔵' }
+  // ===== Color Schemes =====
+  const COLOR_SCHEMES = {
+    classic: [
+      { color: '#e63946', dark: '#9d1f2b', light: '#ff8a8a', emoji: '🔴' },
+      { color: '#06d6a0', dark: '#048f6c', light: '#6eecb8', emoji: '🟢' },
+      { color: '#ffd60a', dark: '#ccaa00', light: '#ffe680', emoji: '🟡' },
+      { color: '#4cc9f0', dark: '#2596be', light: '#a5e4f7', emoji: '🔵' }
+    ],
+    neon: [
+      { color: '#ff006e', dark: '#a30048', light: '#ff66a3', emoji: '💗' },
+      { color: '#00f5d4', dark: '#009e89', light: '#66ffeb', emoji: '💚' },
+      { color: '#fee440', dark: '#b09a00', light: '#fff199', emoji: '💛' },
+      { color: '#00bbf9', dark: '#0077a3', light: '#66d9ff', emoji: '💙' }
+    ],
+    royal: [
+      { color: '#9d0208', dark: '#5e0004', light: '#e85d68', emoji: '👑' },
+      { color: '#2d6a4f', dark: '#1b4332', light: '#74c69d', emoji: '🌿' },
+      { color: '#ffba08', dark: '#b08000', light: '#ffd76b', emoji: '⭐' },
+      { color: '#023e8a', dark: '#012a5e', light: '#4a9eff', emoji: '💎' }
+    ],
+    pastel: [
+      { color: '#ff8fab', dark: '#cc5f7a', light: '#ffb8c9', emoji: '🌸' },
+      { color: '#a0e7e5', dark: '#5fb3b1', light: '#c5f1ef', emoji: '🌊' },
+      { color: '#fbe7c6', dark: '#c9b88e', light: '#fdf2dc', emoji: '🌙' },
+      { color: '#b4f8c8', dark: '#71c785', light: '#d9fce3', emoji: '🍃' }
+    ]
+  };
+
+  // ===== Token Shapes =====
+  const TOKEN_SHAPES = [
+    { id: 'pawn',    name: '♟️ Pawn' },
+    { id: 'circle',  name: '⚪ Circle' },
+    { id: 'diamond', name: '💎 Diamond' },
+    { id: 'star',    name: '⭐ Star' },
+    { id: 'hex',     name: '⬡ Hexagon' }
   ];
 
-  // ===== 52-ঘরের পাথ =====
-  // লাল এর হোম path[0] থেকে শুরু, ডানে ঘুরে
-  const PATH = [
-    // লাল হোম এরিয়া থেকে ডান দিকে (row 6, col 1→5)
-    {x:1,y:6},{x:2,y:6},{x:3,y:6},{x:4,y:6},{x:5,y:6},
-    // উপরের col (col 6, row 5→0)
-    {x:6,y:5},{x:6,y:4},{x:6,y:3},{x:6,y:2},{x:6,y:1},{x:6,y:0},
-    // উপরে ডানে (row 0, col 7, 8)
-    {x:7,y:0},{x:8,y:0},
-    // নিচে ডানে (col 8, row 1→6)
-    {x:8,y:1},{x:8,y:2},{x:8,y:3},{x:8,y:4},{x:8,y:5},
-    // সবুজ হোম থেকে ডানে (row 6, col 9→13)
-    {x:9,y:6},{x:10,y:6},{x:11,y:6},{x:12,y:6},{x:13,y:6},
-    // ডানে col 14, row 6→8
-    {x:14,y:6},{x:14,y:7},{x:14,y:8},
-    // নিচে বামে (row 8, col 13→9)
-    {x:13,y:8},{x:12,y:8},{x:11,y:8},{x:10,y:8},{x:9,y:8},
-    // নিচের col (col 8, row 9→14)
-    {x:8,y:9},{x:8,y:10},{x:8,y:11},{x:8,y:12},{x:8,y:13},{x:8,y:14},
-    // নিচে বামে (row 14, col 7, 6)
-    {x:7,y:14},{x:6,y:14},
-    // উপরে বামে (col 6, row 13→9)
-    {x:6,y:13},{x:6,y:12},{x:6,y:11},{x:6,y:10},{x:6,y:9},
-    // হলুদ হোম থেকে বামে (row 8, col 5→1)
-    {x:5,y:8},{x:4,y:8},{x:3,y:8},{x:2,y:8},{x:1,y:8},
-    // বামে col 0, row 8→6
-    {x:0,y:8},{x:0,y:7},{x:0,y:6}
+  // ===== Token Styles =====
+  const TOKEN_STYLES = [
+    { id: '3d',      name: '🎨 3D' },
+    { id: 'glow',    name: '✨ Glow' },
+    { id: 'glass',   name: '🔮 Glass' },
+    { id: 'flat',    name: '⬛ Flat' }
   ];
-
-  // স্টার্ট পজিশন (প্রতি প্লেয়ারের জন্য)
-  const START_POS = [0, 13, 26, 39];
-
-  // হোম কলাম (শেষ 5 ঘর)
-  const HOME_PATH = {
-    0: [{x:1,y:7},{x:2,y:7},{x:3,y:7},{x:4,y:7},{x:5,y:7}],
-    1: [{x:7,y:1},{x:7,y:2},{x:7,y:3},{x:7,y:4},{x:7,y:5}],
-    2: [{x:13,y:7},{x:12,y:7},{x:11,y:7},{x:10,y:7},{x:9,y:7}],
-    3: [{x:7,y:13},{x:7,y:12},{x:7,y:11},{x:7,y:10},{x:7,y:9}]
-  };
-
-  // হোম বেস (৪টি টোকেন এর পজিশন)
-  const HOME_BASE = {
-    0: [{x:2,y:2},{x:4,y:2},{x:2,y:4},{x:4,y:4}],       // লাল — বাম-উপরে
-    1: [{x:10,y:2},{x:12,y:2},{x:10,y:4},{x:12,y:4}],   // সবুজ — ডান-উপরে
-    2: [{x:10,y:10},{x:12,y:10},{x:10,y:12},{x:12,y:12}], // হলুদ — ডান-নিচে
-    3: [{x:2,y:10},{x:4,y:10},{x:2,y:12},{x:4,y:12}]    // নীল — বাম-নিচে
-  };
-
-  // সেফ স্পট (৮টি)
-  const SAFE = [0, 8, 13, 21, 26, 34, 39, 47];
-
-  // হোম এরিয়ার রঙ (বোর্ডে দেখানোর জন্য)
-  const HOME_AREA = {
-    0: { x: 0, y: 0, color: '#e63946' },
-    1: { x: 9, y: 0, color: '#06d6a0' },
-    2: { x: 9, y: 9, color: '#ffd60a' },
-    3: { x: 0, y: 9, color: '#4cc9f0' }
-  };
 
   // ===== State =====
   let playerCount = 3;
   let botLevel = 'easy';
   let playerName = 'তুমি';
+  let colorScheme = 'classic';
+  let tokenShape = 'pawn';
+  let tokenStyle = '3d';
+
   let players = [];
   let currentPlayer = 0;
   let diceValue = 0;
@@ -103,13 +88,47 @@
   let gameOver = false;
   let statusTimeout = null;
   let consecutiveSixes = 0;
-  let moveAnimation = null;
-  let lastMovedToken = null;
 
-  // ===== টোকেন =====
-  function createToken() {
-    return { state: 'base', pos: 0, homeIdx: -1 }; // base | path | home | done
-  }
+  // ===== বোর্ড পাথ =====
+  const PATH = [
+    {x:1,y:6},{x:2,y:6},{x:3,y:6},{x:4,y:6},{x:5,y:6},
+    {x:6,y:5},{x:6,y:4},{x:6,y:3},{x:6,y:2},{x:6,y:1},{x:6,y:0},
+    {x:7,y:0},{x:8,y:0},
+    {x:8,y:1},{x:8,y:2},{x:8,y:3},{x:8,y:4},{x:8,y:5},
+    {x:9,y:6},{x:10,y:6},{x:11,y:6},{x:12,y:6},{x:13,y:6},
+    {x:14,y:6},{x:14,y:7},{x:14,y:8},
+    {x:13,y:8},{x:12,y:8},{x:11,y:8},{x:10,y:8},{x:9,y:8},
+    {x:8,y:9},{x:8,y:10},{x:8,y:11},{x:8,y:12},{x:8,y:13},{x:8,y:14},
+    {x:7,y:14},{x:6,y:14},
+    {x:6,y:13},{x:6,y:12},{x:6,y:11},{x:6,y:10},{x:6,y:9},
+    {x:5,y:8},{x:4,y:8},{x:3,y:8},{x:2,y:8},{x:1,y:8},
+    {x:0,y:8},{x:0,y:7},{x:0,y:6}
+  ];
+
+  const START_POS = [0, 13, 26, 39];
+
+  const HOME_PATH = {
+    0: [{x:1,y:7},{x:2,y:7},{x:3,y:7},{x:4,y:7},{x:5,y:7}],
+    1: [{x:7,y:1},{x:7,y:2},{x:7,y:3},{x:7,y:4},{x:7,y:5}],
+    2: [{x:13,y:7},{x:12,y:7},{x:11,y:7},{x:10,y:7},{x:9,y:7}],
+    3: [{x:7,y:13},{x:7,y:12},{x:7,y:11},{x:7,y:10},{x:7,y:9}]
+  };
+
+  const HOME_BASE = {
+    0: [{x:2,y:2},{x:4,y:2},{x:2,y:4},{x:4,y:4}],
+    1: [{x:10,y:2},{x:12,y:2},{x:10,y:4},{x:12,y:4}],
+    2: [{x:10,y:10},{x:12,y:10},{x:10,y:12},{x:12,y:12}],
+    3: [{x:2,y:10},{x:4,y:10},{x:2,y:12},{x:4,y:12}]
+  };
+
+  const SAFE = [0, 8, 13, 21, 26, 34, 39, 47];
+
+  const HOME_AREA = {
+    0: { x: 0, y: 0 },
+    1: { x: 9, y: 0 },
+    2: { x: 9, y: 9 },
+    3: { x: 0, y: 9 }
+  };
 
   // ===== সাউন্ড =====
   let audioCtx = null;
@@ -154,6 +173,34 @@
   function clickSound() { playSound(600, 0.05, 'square', 0.04); }
   function safeSound() { playSound(1200, 0.08, 'sine', 0.08); }
 
+  // ===== localStorage =====
+  function saveConfig() {
+    try {
+      localStorage.setItem('ludoConfig', JSON.stringify({
+        colorScheme, tokenShape, tokenStyle, playerCount, botLevel, playerName
+      }));
+    } catch(e) {}
+  }
+  function loadConfig() {
+    try {
+      const saved = localStorage.getItem('ludoConfig');
+      if (saved) {
+        const c = JSON.parse(saved);
+        if (c.colorScheme) colorScheme = c.colorScheme;
+        if (c.tokenShape) tokenShape = c.tokenShape;
+        if (c.tokenStyle) tokenStyle = c.tokenStyle;
+        if (c.playerCount) playerCount = c.playerCount;
+        if (c.botLevel) botLevel = c.botLevel;
+        if (c.playerName) playerName = c.playerName;
+      }
+    } catch(e) {}
+  }
+
+  // ===== Token Class =====
+  function createToken() {
+    return { state: 'base', pos: 0, homeIdx: -1 };
+  }
+
   // ===== Canvas resize =====
   function resizeCanvas() {
     const wrap = canvas.parentElement;
@@ -172,119 +219,199 @@
     window.__rsz = setTimeout(resizeCanvas, 100);
   });
 
-  // ===== আঁকা =====
+  // ===== Helper: রাউন্ডেড rect =====
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
+  // ===== বোর্ড আঁকা =====
   function draw() {
     if (!W) return;
+    const cs = CELL;
+    const scheme = COLOR_SCHEMES[colorScheme];
 
-    // ব্যাকগ্রাউন্ড
-    ctx.fillStyle = '#f8f8f8';
+    // Background gradient
+    const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+    bgGrad.addColorStop(0, '#f8f8f8');
+    bgGrad.addColorStop(1, '#e8e8e8');
+    ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, W, H);
 
-    // 4টি হোম এরিয়া (রঙিন)
-    for (let pid in HOME_AREA) {
+    // 4টি হোম এরিয়া
+    for (let pid = 0; pid < 4; pid++) {
       const a = HOME_AREA[pid];
-      const color = a.color;
+      const c = scheme[pid];
 
-      // বাইরের ফ্রেম
-      ctx.fillStyle = color;
-      ctx.fillRect(a.x * CELL, a.y * CELL, 6 * CELL, 6 * CELL);
+      // Outer frame with gradient
+      const grad = ctx.createLinearGradient(
+        a.x * cs, a.y * cs,
+        (a.x + 6) * cs, (a.y + 6) * cs
+      );
+      grad.addColorStop(0, c.light);
+      grad.addColorStop(0.5, c.color);
+      grad.addColorStop(1, c.dark);
 
-      // ভিতরের সাদা
+      ctx.fillStyle = grad;
+      roundRect(ctx, a.x * cs, a.y * cs, 6 * cs, 6 * cs, cs * 0.4);
+      ctx.fill();
+
+      // Inner white area
       ctx.fillStyle = '#fff';
-      ctx.fillRect((a.x + 0.35) * CELL, (a.y + 0.35) * CELL, 5.3 * CELL, 5.3 * CELL);
+      roundRect(ctx,
+        (a.x + 0.4) * cs, (a.y + 0.4) * cs,
+        5.2 * cs, 5.2 * cs,
+        cs * 0.3
+      );
+      ctx.fill();
 
-      // 4টি টোকেন স্লট
+      // Slot circles with 3D effect
       const slots = HOME_BASE[pid];
       slots.forEach(s => {
-        const cx = (s.x + 0.5) * CELL;
-        const cy = (s.y + 0.5) * CELL;
+        const cx = (s.x + 0.5) * cs;
+        const cy = (s.y + 0.5) * cs;
+        const r = cs * 0.55;
+
+        // Shadow
         ctx.beginPath();
-        ctx.arc(cx, cy, CELL * 0.55, 0, Math.PI * 2);
-        ctx.fillStyle = color;
+        ctx.arc(cx + 1, cy + 2, r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0,0,0,0.15)';
         ctx.fill();
-        ctx.strokeStyle = '#fff';
+
+        // Circle with gradient
+        const slotGrad = ctx.createRadialGradient(
+          cx - r * 0.3, cy - r * 0.3, r * 0.1,
+          cx, cy, r
+        );
+        slotGrad.addColorStop(0, c.light);
+        slotGrad.addColorStop(0.6, c.color);
+        slotGrad.addColorStop(1, c.dark);
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fillStyle = slotGrad;
+        ctx.fill();
+
+        // Border
+        ctx.strokeStyle = 'rgba(255,255,255,0.9)';
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        // ভিতরের হাইলাইট
+        // Highlight ring
         ctx.beginPath();
-        ctx.arc(cx, cy, CELL * 0.4, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+        ctx.arc(cx - r * 0.35, cy - r * 0.35, r * 0.35, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(255,255,255,0.7)';
         ctx.lineWidth = 1.5;
         ctx.stroke();
       });
     }
 
-    // পাথ সেল (সাদা ঘর)
+    // পাথ সেল
     PATH.forEach((p, i) => {
-      const x = p.x * CELL;
-      const y = p.y * CELL;
-
-      // কোন প্লেয়ারের স্টার্ট?
+      const x = p.x * cs;
+      const y = p.y * cs;
       const starterPid = START_POS.indexOf(i);
 
+      // Cell background
       if (starterPid !== -1) {
-        // স্টার্ট সেলে রঙ
-        ctx.fillStyle = PLAYERS[starterPid].color;
+        const grad = ctx.createLinearGradient(x, y, x + cs, y + cs);
+        grad.addColorStop(0, scheme[starterPid].light);
+        grad.addColorStop(1, scheme[starterPid].color);
+        ctx.fillStyle = grad;
+      } else if (SAFE.includes(i)) {
+        ctx.fillStyle = '#fffaeb';
       } else {
-        // সাধারণ সাদা
         ctx.fillStyle = '#ffffff';
       }
-      ctx.fillRect(x, y, CELL, CELL);
 
-      // বর্ডার
-      ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+      roundRect(ctx, x + 1, y + 1, cs - 2, cs - 2, cs * 0.15);
+      ctx.fill();
+
+      // Border
+      ctx.strokeStyle = 'rgba(0,0,0,0.12)';
       ctx.lineWidth = 1;
-      ctx.strokeRect(x + 0.5, y + 0.5, CELL - 1, CELL - 1);
+      ctx.stroke();
 
-      // সেফ স্পট মার্ক (স্টার)
+      // Safe star
       if (SAFE.includes(i)) {
-        drawStar(x + CELL/2, y + CELL/2, CELL * 0.32, 5, '#333');
+        drawStar(x + cs/2, y + cs/2, cs * 0.32, 5, '#ffcc00');
+      }
+
+      // Arrow on start cells
+      if (starterPid !== -1) {
+        drawArrow(x + cs/2, y + cs/2, cs * 0.3, scheme[starterPid].dark);
       }
     });
 
-    // হোম কলাম (রঙিন)
-    for (let pid in HOME_PATH) {
+    // হোম কলাম (colored paths)
+    for (let pid = 0; pid < 4; pid++) {
       const path = HOME_PATH[pid];
-      const color = PLAYERS[pid].color;
-      path.forEach(p => {
-        ctx.fillStyle = color;
-        ctx.globalAlpha = 0.75;
-        ctx.fillRect(p.x * CELL, p.y * CELL, CELL, CELL);
-        ctx.globalAlpha = 1;
+      const c = scheme[pid];
+      path.forEach((p, idx) => {
+        const x = p.x * cs;
+        const y = p.y * cs;
 
-        // ভিতরে হালকা শেড
-        ctx.fillStyle = PLAYERS[pid].light;
-        ctx.globalAlpha = 0.4;
-        ctx.fillRect(p.x * CELL + 4, p.y * CELL + 4, CELL - 8, CELL - 8);
-        ctx.globalAlpha = 1;
+        const grad = ctx.createLinearGradient(x, y, x + cs, y + cs);
+        grad.addColorStop(0, c.light);
+        grad.addColorStop(1, c.color);
 
-        ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+        ctx.fillStyle = grad;
+        roundRect(ctx, x + 1, y + 1, cs - 2, cs - 2, cs * 0.15);
+        ctx.fill();
+
+        ctx.strokeStyle = 'rgba(0,0,0,0.15)';
         ctx.lineWidth = 1;
-        ctx.strokeRect(p.x * CELL + 0.5, p.y * CELL + 0.5, CELL - 1, CELL - 1);
+        ctx.stroke();
+
+        // Highlight
+        ctx.fillStyle = 'rgba(255,255,255,0.35)';
+        roundRect(ctx, x + 3, y + 3, cs - 6, (cs - 6) * 0.4, cs * 0.1);
+        ctx.fill();
       });
     }
 
-    // সেন্টার (4টি ত্রিভুজ)
-    drawCenter();
+    // Center (4 triangles)
+    drawCenter(cs, scheme);
 
-    // টোকেন
+    // All tokens
     players.forEach((player, pid) => {
       player.tokens.forEach((token, tIdx) => {
         let pos = null;
         if (token.state === 'base') pos = HOME_BASE[pid][tIdx];
         else if (token.state === 'path') pos = PATH[token.pos];
         else if (token.state === 'home') pos = HOME_PATH[pid][token.homeIdx];
-        else if (token.state === 'done') {
-          // হোম কলামের শেষ ঘরে
-          pos = HOME_PATH[pid][4];
-        }
-        if (pos) drawToken(pid, pos.x, pos.y, tIdx, token);
+        else if (token.state === 'done') pos = HOME_PATH[pid][4];
+        if (pos) drawToken(pid, pos.x, pos.y, tIdx, token, scheme);
       });
     });
   }
 
+  function drawArrow(cx, cy, size, color) {
+    ctx.fillStyle = color;
+    ctx.globalAlpha = 0.5;
+    ctx.beginPath();
+    ctx.moveTo(cx - size * 0.5, cy + size * 0.5);
+    ctx.lineTo(cx + size * 0.5, cy + size * 0.5);
+    ctx.lineTo(cx, cy - size * 0.5);
+    ctx.closePath();
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+
   function drawStar(cx, cy, r, points, color) {
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.3)';
+    ctx.shadowBlur = 3;
+    ctx.shadowOffsetY = 1;
     ctx.beginPath();
     for (let i = 0; i < points * 2; i++) {
       const angle = (i * Math.PI) / points - Math.PI / 2;
@@ -297,15 +424,27 @@
     ctx.closePath();
     ctx.fillStyle = color;
     ctx.fill();
+    ctx.restore();
   }
 
-  function drawCenter() {
-    const cx = 6 * CELL;
-    const cy = 6 * CELL;
-    const size = 3 * CELL;
+  function drawCenter(cs, scheme) {
+    const cx = 6 * cs;
+    const cy = 6 * cs;
+    const size = 3 * cs;
 
-    // সবুজ ত্রিভুজ (উপরে)
-    ctx.fillStyle = PLAYERS[1].color;
+    // 4 triangles with gradients
+    const colors = [
+      { color: scheme[0].color, light: scheme[0].light },
+      { color: scheme[1].color, light: scheme[1].light },
+      { color: scheme[2].color, light: scheme[2].light },
+      { color: scheme[3].color, light: scheme[3].light }
+    ];
+
+    // Top (green - player 1)
+    let grad = ctx.createLinearGradient(cx + size/2, cy, cx + size/2, cy + size/2);
+    grad.addColorStop(0, colors[1].light);
+    grad.addColorStop(1, colors[1].color);
+    ctx.fillStyle = grad;
     ctx.beginPath();
     ctx.moveTo(cx + size/2, cy);
     ctx.lineTo(cx + size, cy + size/2);
@@ -313,8 +452,11 @@
     ctx.closePath();
     ctx.fill();
 
-    // হলুদ (ডানে)
-    ctx.fillStyle = PLAYERS[2].color;
+    // Right (yellow - player 2)
+    grad = ctx.createLinearGradient(cx + size/2, cy + size/2, cx + size, cy + size/2);
+    grad.addColorStop(0, colors[2].light);
+    grad.addColorStop(1, colors[2].color);
+    ctx.fillStyle = grad;
     ctx.beginPath();
     ctx.moveTo(cx + size, cy + size/2);
     ctx.lineTo(cx + size/2, cy + size);
@@ -322,8 +464,11 @@
     ctx.closePath();
     ctx.fill();
 
-    // নীল (নিচে)
-    ctx.fillStyle = PLAYERS[3].color;
+    // Bottom (blue - player 3)
+    grad = ctx.createLinearGradient(cx + size/2, cy + size/2, cx + size/2, cy + size);
+    grad.addColorStop(0, colors[3].light);
+    grad.addColorStop(1, colors[3].color);
+    ctx.fillStyle = grad;
     ctx.beginPath();
     ctx.moveTo(cx + size/2, cy + size);
     ctx.lineTo(cx, cy + size/2);
@@ -331,8 +476,11 @@
     ctx.closePath();
     ctx.fill();
 
-    // লাল (বামে)
-    ctx.fillStyle = PLAYERS[0].color;
+    // Left (red - player 0)
+    grad = ctx.createLinearGradient(cx, cy + size/2, cx + size/2, cy + size/2);
+    grad.addColorStop(0, colors[0].light);
+    grad.addColorStop(1, colors[0].color);
+    ctx.fillStyle = grad;
     ctx.beginPath();
     ctx.moveTo(cx, cy + size/2);
     ctx.lineTo(cx + size/2, cy);
@@ -340,95 +488,232 @@
     ctx.closePath();
     ctx.fill();
 
-    // সেন্টার হাইলাইট
+    // Border
+    ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(cx, cy, size, size);
+
+    // Center circle with glow
     ctx.beginPath();
-    ctx.arc(cx + size/2, cy + size/2, size * 0.15, 0, Math.PI * 2);
-    ctx.fillStyle = '#fff';
+    ctx.arc(cx + size/2, cy + size/2, size * 0.18, 0, Math.PI * 2);
+    const centerGrad = ctx.createRadialGradient(
+      cx + size/2 - size*0.05, cy + size/2 - size*0.05, 0,
+      cx + size/2, cy + size/2, size * 0.18
+    );
+    centerGrad.addColorStop(0, '#fff');
+    centerGrad.addColorStop(1, '#ffcc00');
+    ctx.fillStyle = centerGrad;
     ctx.fill();
-    ctx.strokeStyle = '#333';
+    ctx.strokeStyle = '#886600';
     ctx.lineWidth = 2;
     ctx.stroke();
+
+    // Star in center
+    drawStar(cx + size/2, cy + size/2, size * 0.12, 5, '#886600');
   }
 
-  function drawToken(pid, gx, gy, tIdx, token) {
+  function drawToken(pid, gx, gy, tIdx, token, scheme) {
+    const c = scheme[pid];
     const cx = (gx + 0.5) * CELL;
     const cy = (gy + 0.5) * CELL;
-    const r = CELL * 0.36;
 
-    // ছায়া
+    ctx.save();
+
+    // Determine size
+    const baseR = CELL * 0.36;
+    const r = baseR;
+
+    // Shadow
     ctx.beginPath();
-    ctx.ellipse(cx + 2, cy + 3, r * 0.9, r * 0.5, 0, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.ellipse(cx + 2, cy + 3, r * 0.95, r * 0.5, 0, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
     ctx.fill();
 
-    // টোকেন বডি
-    const grad = ctx.createRadialGradient(
-      cx - r * 0.4, cy - r * 0.4, r * 0.1,
-      cx, cy, r
-    );
-    grad.addColorStop(0, PLAYERS[pid].light);
-    grad.addColorStop(0.6, PLAYERS[pid].color);
-    grad.addColorStop(1, PLAYERS[pid].dark);
+    // Draw by shape
+    if (tokenShape === 'pawn') {
+      drawPawnToken(cx, cy, r, c, pid, token);
+    } else if (tokenShape === 'circle') {
+      drawCircleToken(cx, cy, r, c, pid, token);
+    } else if (tokenShape === 'diamond') {
+      drawDiamondToken(cx, cy, r, c, pid, token);
+    } else if (tokenShape === 'star') {
+      drawStarToken(cx, cy, r, c, pid, token);
+    } else if (tokenShape === 'hex') {
+      drawHexToken(cx, cy, r, c, pid, token);
+    }
 
-    ctx.beginPath();
-    ctx.arc(cx, cy, r, 0, Math.PI * 2);
-    ctx.fillStyle = grad;
-    ctx.fill();
-    ctx.strokeStyle = PLAYERS[pid].dark;
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-
-    // হাইলাইট
-    ctx.beginPath();
-    ctx.arc(cx - r * 0.35, cy - r * 0.35, r * 0.3, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
-    ctx.fill();
-
-    // যদি এই টোকেন চালানো যায় (মানুষের পালা)
+    // Move highlight
     if (mustMoveToken && pid === currentPlayer && !players[pid].isBot &&
         isValidMove(pid, tIdx, diceValue)) {
-      // সবুজ রিং
       ctx.beginPath();
-      ctx.arc(cx, cy, r + 5, 0, Math.PI * 2);
+      ctx.arc(cx, cy, r + 6, 0, Math.PI * 2);
       ctx.strokeStyle = '#00ff00';
       ctx.lineWidth = 3;
       ctx.setLineDash([6, 4]);
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // স্পন্দন
       const pulse = 1 + Math.sin(Date.now() * 0.008) * 0.1;
       ctx.beginPath();
-      ctx.arc(cx, cy, (r + 8) * pulse, 0, Math.PI * 2);
+      ctx.arc(cx, cy, (r + 9) * pulse, 0, Math.PI * 2);
       ctx.strokeStyle = 'rgba(0,255,0,0.4)';
       ctx.lineWidth = 2;
       ctx.stroke();
     }
 
-    // ডাবল টোকেন হলে ছোট করে দুইটা আঁকা
-    const stacked = players[pid].tokens.filter(t => {
-      if (t === token) return false;
-      if (t.state === 'base') return false;
-      if (token.state === 'path' && t.state === 'path' && t.pos === token.pos) return true;
-      if (token.state === 'home' && t.state === 'home' && t.homeIdx === token.homeIdx) return true;
-      return false;
-    });
+    ctx.restore();
+  }
 
-    if (stacked.length > 0) {
-      // বাম-উপরে ছোট টোকেন দেখাও
-      const offset = CELL * 0.15;
-      ctx.beginPath();
-      ctx.arc(cx - offset, cy - offset, r * 0.5, 0, Math.PI * 2);
-      ctx.fillStyle = PLAYERS[pid].color;
-      ctx.fill();
-      ctx.strokeStyle = '#fff';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
+  function applyTokenStyle(cx, cy, r, c) {
+    // returns fill style based on tokenStyle
+    if (tokenStyle === 'flat') {
+      return c.color;
     }
+    const grad = ctx.createRadialGradient(
+      cx - r * 0.4, cy - r * 0.4, r * 0.1,
+      cx, cy, r
+    );
+    if (tokenStyle === 'glow') {
+      grad.addColorStop(0, '#ffffff');
+      grad.addColorStop(0.4, c.light);
+      grad.addColorStop(1, c.color);
+    } else if (tokenStyle === 'glass') {
+      grad.addColorStop(0, 'rgba(255,255,255,0.9)');
+      grad.addColorStop(0.4, c.light + 'aa');
+      grad.addColorStop(1, c.dark + 'cc');
+    } else {
+      grad.addColorStop(0, c.light);
+      grad.addColorStop(0.5, c.color);
+      grad.addColorStop(1, c.dark);
+    }
+    return grad;
+  }
+
+  function drawPawnToken(cx, cy, r, c, pid, token) {
+    // Main circular body
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fillStyle = applyTokenStyle(cx, cy, r, c);
+    ctx.fill();
+    ctx.strokeStyle = c.dark;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Glass effect if selected
+    if (tokenStyle === 'glass') {
+      ctx.beginPath();
+      ctx.arc(cx - r * 0.3, cy - r * 0.3, r * 0.4, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx.fill();
+    }
+
+    // Highlight
+    ctx.beginPath();
+    ctx.arc(cx - r * 0.35, cy - r * 0.35, r * 0.28, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.fill();
+
+    // Inner ring
+    ctx.beginPath();
+    ctx.arc(cx, cy, r * 0.55, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Center dot
+    ctx.beginPath();
+    ctx.arc(cx, cy, r * 0.2, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.fill();
+  }
+
+  function drawCircleToken(cx, cy, r, c, pid, token) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fillStyle = applyTokenStyle(cx, cy, r, c);
+    ctx.fill();
+    ctx.strokeStyle = c.dark;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(cx - r * 0.35, cy - r * 0.35, r * 0.28, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.fill();
+  }
+
+  function drawDiamondToken(cx, cy, r, c, pid, token) {
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - r);
+    ctx.lineTo(cx + r * 0.75, cy);
+    ctx.lineTo(cx, cy + r);
+    ctx.lineTo(cx - r * 0.75, cy);
+    ctx.closePath();
+    ctx.fillStyle = applyTokenStyle(cx, cy, r, c);
+    ctx.fill();
+    ctx.strokeStyle = c.dark;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - r * 0.6);
+    ctx.lineTo(cx + r * 0.2, cy);
+    ctx.lineTo(cx, cy + r * 0.2);
+    ctx.lineTo(cx - r * 0.2, cy);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.fill();
+  }
+
+  function drawStarToken(cx, cy, r, c, pid, token) {
+    ctx.beginPath();
+    for (let i = 0; i < 10; i++) {
+      const angle = (i * Math.PI) / 5 - Math.PI / 2;
+      const radius = i % 2 === 0 ? r : r * 0.45;
+      const x = cx + Math.cos(angle) * radius;
+      const y = cy + Math.sin(angle) * radius;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fillStyle = applyTokenStyle(cx, cy, r, c);
+    ctx.fill();
+    ctx.strokeStyle = c.dark;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Center
+    ctx.beginPath();
+    ctx.arc(cx, cy, r * 0.25, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.fill();
+  }
+
+  function drawHexToken(cx, cy, r, c, pid, token) {
+    ctx.beginPath();
+    for (let i = 0; i < 6; i++) {
+      const angle = (i * Math.PI) / 3 - Math.PI / 2;
+      const x = cx + Math.cos(angle) * r;
+      const y = cy + Math.sin(angle) * r;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fillStyle = applyTokenStyle(cx, cy, r, c);
+    ctx.fill();
+    ctx.strokeStyle = c.dark;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, r * 0.35, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.fill();
   }
 
   // ===== Game Init =====
   function initGame() {
+    const scheme = COLOR_SCHEMES[colorScheme];
     players = [];
     for (let i = 0; i < playerCount; i++) {
       players.push({
@@ -436,7 +721,8 @@
         name: i === 0 ? playerName : 'বট ' + i,
         isBot: i !== 0,
         tokens: [createToken(), createToken(), createToken(), createToken()],
-        finished: 0
+        finished: 0,
+        colors: scheme[i]
       });
     }
     currentPlayer = 0;
@@ -446,7 +732,20 @@
     gameOver = false;
     consecutiveSixes = 0;
 
-    updatePlayersBar();
+    // Update player bar colors
+    document.querySelectorAll('.player-pill').forEach(el => {
+      const pid = parseInt(el.dataset.pid);
+      if (pid < playerCount) {
+        el.style.display = 'flex';
+        const c = scheme[pid];
+        el.querySelector('.pill-color').style.background = c.color;
+        el.querySelector('.pill-name').textContent =
+          pid === 0 ? playerName : 'বট ' + pid;
+      } else {
+        el.style.display = 'none';
+      }
+    });
+
     updateTurnIndicator();
     clearStatus();
 
@@ -455,19 +754,6 @@
     diceFace.textContent = '🎲';
 
     draw();
-  }
-
-  function updatePlayersBar() {
-    document.querySelectorAll('.player-pill').forEach(el => {
-      const pid = parseInt(el.dataset.pid);
-      if (pid < playerCount) {
-        el.style.display = 'flex';
-        el.querySelector('.pill-name').textContent =
-          pid === 0 ? playerName : 'বট ' + pid;
-      } else {
-        el.style.display = 'none';
-      }
-    });
   }
 
   function updateActivePlayer() {
@@ -479,10 +765,11 @@
   }
 
   function updateTurnIndicator() {
-    const p = PLAYERS[currentPlayer];
+    const scheme = COLOR_SCHEMES[colorScheme];
+    const c = scheme[currentPlayer];
     const name = players[currentPlayer].name;
-    turnIndicator.textContent = p.emoji + ' ' + name + ' এর পালা';
-    turnIndicator.style.color = p.color;
+    turnIndicator.textContent = c.emoji + ' ' + name + ' এর পালা';
+    turnIndicator.style.color = c.color;
     updateActivePlayer();
   }
 
@@ -519,18 +806,15 @@
       if (count > 10) {
         clearInterval(interval);
         diceBtn.classList.remove('rolling');
-
         diceValue = Math.floor(Math.random() * 6) + 1;
         diceFace.textContent = faces[diceValue - 1];
         hasRolled = true;
-
         setTimeout(() => handleRollResult(), 200);
       }
     }, 60);
   }
 
   function handleRollResult() {
-    // 3 বার 6 → টার্ন বাতিল
     if (diceValue === 6) {
       consecutiveSixes++;
       if (consecutiveSixes >= 3) {
@@ -543,22 +827,17 @@
     }
 
     const moves = getValidMoves(currentPlayer, diceValue);
-
     if (moves.length === 0) {
       showStatus('নড়া যায় না!', false);
       setTimeout(() => nextTurn(), 1200);
       return;
     }
 
-    // শুধু একটাই মুভ থাকলে অটো চালাও (মানুষের জন্যও)
     if (moves.length === 1) {
-      setTimeout(() => {
-        executeMove(currentPlayer, moves[0], diceValue);
-      }, 400);
+      setTimeout(() => executeMove(currentPlayer, moves[0], diceValue), 400);
       return;
     }
 
-    // বট হলে AI থেকে চালাও
     if (players[currentPlayer].isBot) {
       setTimeout(() => {
         const bestMove = botChooseMove(moves);
@@ -567,23 +846,18 @@
       return;
     }
 
-    // মানুষ — টোকেন ক্লিকের জন্য অপেক্ষা
     mustMoveToken = true;
     showStatus('টোকেন বাছাই করো', true);
     draw();
   }
 
-  // ===== Valid Move =====
   function isValidMove(pid, tIdx, dice) {
     const token = players[pid].tokens[tIdx];
     const startOffset = START_POS[pid];
 
-    if (token.state === 'base') {
-      return dice === 6;
-    }
+    if (token.state === 'base') return dice === 6;
     if (token.state === 'path') {
       const rel = (token.pos - startOffset + 52) % 52;
-      // হোমে ঢোকার জন্য: 51 হলে পাথের শেষ, তারপর হোম
       if (rel + dice > 56) return false;
       return true;
     }
@@ -602,7 +876,6 @@
     return valid;
   }
 
-  // ===== Move Execute =====
   function executeMove(pid, tIdx, dice) {
     const player = players[pid];
     const token = player.tokens[tIdx];
@@ -612,39 +885,32 @@
     let killed = false;
 
     if (token.state === 'base') {
-      // বেস থেকে বের
       token.state = 'path';
       token.pos = startOffset;
       safeSound();
-
     } else if (token.state === 'path') {
       const rel = (token.pos - startOffset + 52) % 52;
       const newRel = rel + dice;
 
       if (newRel === 56) {
-        // সেন্টারে পৌঁছেছে
         token.state = 'done';
         token.homeIdx = 4;
         player.finished++;
         enteredHome = true;
         homeSound();
       } else if (newRel > 50) {
-        // হোম কলামে ঢুকছে
         token.state = 'home';
         token.homeIdx = newRel - 51;
         enteredHome = true;
         homeSound();
       } else {
-        // পাথে চলা
         token.pos = (token.pos + dice) % 52;
 
-        // মার খাওয়া চেক করো
         if (!SAFE.includes(token.pos)) {
           players.forEach((p, otherPid) => {
             if (otherPid === pid) return;
             p.tokens.forEach(otherToken => {
-              if (otherToken.state === 'path' &&
-                  otherToken.pos === token.pos) {
+              if (otherToken.state === 'path' && otherToken.pos === token.pos) {
                 otherToken.state = 'base';
                 otherToken.pos = 0;
                 killed = true;
@@ -672,32 +938,23 @@
     }
 
     if (!killed && !enteredHome) moveSound();
-
-    lastMovedToken = { pid, tIdx };
     mustMoveToken = false;
     draw();
 
-    // জেতার চেক
     if (player.finished === 4) {
       gameOver = true;
       setTimeout(() => showWin(pid), 600);
       return;
     }
 
-    // 6 পেলে বোনাস টার্ন, কিল করলে বোনাস, হোমে গেলে বোনাস
     const bonusTurn = (dice === 6) || killed || enteredHome;
-
     if (bonusTurn) {
-      if (dice === 6) {
-        showStatus('🎲 6! আবার পালা', true);
-      } else if (killed) {
-        showStatus('💥 কিল! আবার পালা', true);
-      } else if (enteredHome) {
-        showStatus('🏠 হোম! আবার পালা', true);
-      }
+      if (dice === 6) showStatus('🎲 6! আবার পালা', true);
+      else if (killed) showStatus('💥 কিল! আবার পালা', true);
+      else if (enteredHome) showStatus('🏠 হোম! আবার পালা', true);
+
       hasRolled = false;
       diceValue = 0;
-
       setTimeout(() => {
         if (players[currentPlayer].isBot) {
           diceBtn.disabled = true;
@@ -740,7 +997,6 @@
 
     diceBtn.classList.add('rolling');
     diceSound();
-
     const faces = ['⚀','⚁','⚂','⚃','⚄','⚅'];
     let count = 0;
     const interval = setInterval(() => {
@@ -749,11 +1005,9 @@
       if (count > 10) {
         clearInterval(interval);
         diceBtn.classList.remove('rolling');
-
         diceValue = Math.floor(Math.random() * 6) + 1;
         diceFace.textContent = faces[diceValue - 1];
         hasRolled = true;
-
         setTimeout(() => handleRollResult(), 300);
       }
     }, 60);
@@ -763,9 +1017,8 @@
     const player = players[currentPlayer];
     const startOffset = START_POS[currentPlayer];
 
-    // === EXPERT LEVEL ===
     if (botLevel === 'expert') {
-      // 1. কিল করতে পারে?
+      // Kill?
       for (const tIdx of moves) {
         const token = player.tokens[tIdx];
         if (token.state === 'path') {
@@ -773,31 +1026,26 @@
           for (let opid = 0; opid < players.length; opid++) {
             if (opid === currentPlayer) continue;
             for (const ot of players[opid].tokens) {
-              if (ot.state === 'path' && ot.pos === newPos &&
-                  !SAFE.includes(newPos)) {
-                return tIdx;
-              }
+              if (ot.state === 'path' && ot.pos === newPos && !SAFE.includes(newPos)) return tIdx;
             }
           }
         }
       }
-      // 2. হোমে পৌঁছাবে?
+      // Home soon?
       for (const tIdx of moves) {
         const token = player.tokens[tIdx];
-        if (token.state === 'home') {
-          if (token.homeIdx + diceValue >= 5) return tIdx;
-        }
         if (token.state === 'path') {
           const rel = (token.pos - startOffset + 52) % 52;
           if (rel + diceValue === 56) return tIdx;
           if (rel + diceValue > 50) return tIdx;
         }
+        if (token.state === 'home' && token.homeIdx + diceValue >= 5) return tIdx;
       }
-      // 3. বেস থেকে বের হবে?
+      // Leave base?
       for (const tIdx of moves) {
         if (player.tokens[tIdx].state === 'base' && diceValue === 6) return tIdx;
       }
-      // 4. সেফ স্পটে যাবে?
+      // Safe?
       for (const tIdx of moves) {
         const token = player.tokens[tIdx];
         if (token.state === 'path') {
@@ -807,9 +1055,7 @@
       }
     }
 
-    // === HARD LEVEL ===
     if (botLevel === 'hard' || botLevel === 'expert') {
-      // কিল চেক
       for (const tIdx of moves) {
         const token = player.tokens[tIdx];
         if (token.state === 'path') {
@@ -817,22 +1063,17 @@
           for (let opid = 0; opid < players.length; opid++) {
             if (opid === currentPlayer) continue;
             for (const ot of players[opid].tokens) {
-              if (ot.state === 'path' && ot.pos === newPos &&
-                  !SAFE.includes(newPos)) {
-                return tIdx;
-              }
+              if (ot.state === 'path' && ot.pos === newPos && !SAFE.includes(newPos)) return tIdx;
             }
           }
         }
       }
-      // বেস থেকে বের
       for (const tIdx of moves) {
         if (player.tokens[tIdx].state === 'base') return tIdx;
       }
     }
 
-    // === EASY LEVEL — র‍্যান্ডম ===
-    // সর্বোচ্চ advance যেটা সেটা বেছে নাও
+    // Easy — pick max advance
     let best = moves[0];
     let bestScore = -1;
     for (const tIdx of moves) {
@@ -848,7 +1089,7 @@
     return best;
   }
 
-  // ===== টোকেন ক্লিক =====
+  // ===== Canvas click =====
   canvas.addEventListener('click', e => {
     if (!mustMoveToken) return;
     if (players[currentPlayer].isBot) return;
@@ -860,7 +1101,6 @@
     const pid = currentPlayer;
     const player = players[pid];
 
-    // সবচেয়ে কাছের টোকেন খুঁজে বের করো
     let closest = null;
     let closestDist = Infinity;
 
@@ -878,26 +1118,26 @@
       const cy = (pos.y + 0.5) * CELL;
       const dist = Math.sqrt((x - cx) ** 2 + (y - cy) ** 2);
 
-      if (dist < CELL * 0.9 && dist < closestDist) {
+      if (dist < CELL * 0.95 && dist < closestDist) {
         closest = tIdx;
         closestDist = dist;
       }
     }
 
-    if (closest !== null) {
-      executeMove(pid, closest, diceValue);
-    }
+    if (closest !== null) executeMove(pid, closest, diceValue);
   });
 
   // ===== Win =====
   function showWin(pid) {
     winSound();
-    const p = PLAYERS[pid];
+    const scheme = COLOR_SCHEMES[colorScheme];
+    const c = scheme[pid];
     const name = players[pid].name;
 
     winTitle.textContent = '🎉 ' + (pid === 0 ? 'VICTORY!' : 'DEFEAT!') + ' 🎉';
     winText.textContent = pid === 0 ? 'তুমি জিতেছ! 🏆' : name + ' জিতেছে!';
-    winText.style.color = p.color;
+    winText.style.color = c.color;
+    winStats.innerHTML = '<p>🏆 ' + name + ' — সব টোকেন হোম</p>';
 
     createConfetti();
 
@@ -905,16 +1145,12 @@
     gameScreen.classList.add('hidden');
     winScreen.classList.remove('hidden');
 
-    // 6 সেকেন্ড পর confetti বন্ধ
-    setTimeout(() => {
-      winConfetti.innerHTML = '';
-    }, 6000);
+    setTimeout(() => { winConfetti.innerHTML = ''; }, 6000);
   }
 
   function createConfetti() {
     winConfetti.innerHTML = '';
     const colors = ['#e63946', '#06d6a0', '#ffd60a', '#4cc9f0', '#ffcc00', '#ff69b4'];
-
     for (let i = 0; i < 60; i++) {
       const el = document.createElement('div');
       el.className = 'confetti-piece';
@@ -931,10 +1167,12 @@
   // ===== Screen Nav =====
   function showScreen(name) {
     menuScreen.classList.add('hidden');
+    customScreen.classList.add('hidden');
     gameScreen.classList.add('hidden');
     winScreen.classList.add('hidden');
 
     if (name === 'menu') menuScreen.classList.remove('hidden');
+    if (name === 'custom') customScreen.classList.remove('hidden');
     if (name === 'game') gameScreen.classList.remove('hidden');
     if (name === 'win') winScreen.classList.remove('hidden');
 
@@ -945,12 +1183,121 @@
     }
   }
 
+  // ===== Customize UI =====
+  function buildCustomUI() {
+    // Shape row
+    const shapeRow = $('shapeRow');
+    if (shapeRow) {
+      shapeRow.innerHTML = '';
+      TOKEN_SHAPES.forEach(s => {
+        const btn = document.createElement('button');
+        btn.className = 'chip' + (tokenShape === s.id ? ' active' : '');
+        btn.textContent = s.name;
+        btn.onclick = () => {
+          tokenShape = s.id; saveConfig(); buildCustomUI(); clickSound();
+          renderTokenPreview();
+        };
+        shapeRow.appendChild(btn);
+      });
+    }
+
+    // Style row
+    const styleRow = $('styleRow');
+    if (styleRow) {
+      styleRow.innerHTML = '';
+      TOKEN_STYLES.forEach(s => {
+        const btn = document.createElement('button');
+        btn.className = 'chip' + (tokenStyle === s.id ? ' active' : '');
+        btn.textContent = s.name;
+        btn.onclick = () => {
+          tokenStyle = s.id; saveConfig(); buildCustomUI(); clickSound();
+          renderTokenPreview();
+        };
+        styleRow.appendChild(btn);
+      });
+    }
+
+    // Color row
+    const colorRow = $('colorRow');
+    if (colorRow) {
+      colorRow.innerHTML = '';
+      Object.keys(COLOR_SCHEMES).forEach(key => {
+        const btn = document.createElement('button');
+        btn.className = 'chip' + (colorScheme === key ? ' active' : '');
+        btn.textContent = key.charAt(0).toUpperCase() + key.slice(1);
+        btn.onclick = () => {
+          colorScheme = key; saveConfig(); buildCustomUI(); clickSound();
+          renderTokenPreview();
+        };
+        colorRow.appendChild(btn);
+      });
+    }
+  }
+
+  function renderTokenPreview() {
+    if (!tokenPreview) return;
+    const ctx2 = tokenPreview.getContext('2d');
+    const w = tokenPreview.width;
+    const h = tokenPreview.height;
+    const scheme = COLOR_SCHEMES[colorScheme];
+
+    ctx2.clearRect(0, 0, w, h);
+
+    // 4 tokens
+    const spacing = w / 4;
+    for (let i = 0; i < 4; i++) {
+      const cx = spacing * (i + 0.5);
+      const cy = h / 2;
+      const r = 22;
+
+      // Shadow
+      ctx2.beginPath();
+      ctx2.ellipse(cx + 2, cy + 3, r * 0.95, r * 0.5, 0, 0, Math.PI * 2);
+      ctx2.fillStyle = 'rgba(0,0,0,0.4)';
+      ctx2.fill();
+
+      // Save context for reuse (use main draw functions)
+      const saveCtx = ctx;
+      const saveShape = tokenShape;
+      const saveStyle = tokenStyle;
+
+      // Temporary swap - draw here using functions (they use main ctx)
+      // Simple custom drawing:
+      drawPreviewToken(ctx2, cx, cy, r, scheme[i]);
+    }
+  }
+
+  function drawPreviewToken(c, cx, cy, r, colors) {
+    // Simple circular token preview
+    const grad = c.createRadialGradient(
+      cx - r * 0.4, cy - r * 0.4, r * 0.1,
+      cx, cy, r
+    );
+    grad.addColorStop(0, colors.light);
+    grad.addColorStop(0.5, colors.color);
+    grad.addColorStop(1, colors.dark);
+
+    c.beginPath();
+    c.arc(cx, cy, r, 0, Math.PI * 2);
+    c.fillStyle = grad;
+    c.fill();
+    c.strokeStyle = colors.dark;
+    c.lineWidth = 2;
+    c.stroke();
+
+    c.beginPath();
+    c.arc(cx - r * 0.35, cy - r * 0.35, r * 0.3, 0, Math.PI * 2);
+    c.fillStyle = 'rgba(255,255,255,0.7)';
+    c.fill();
+  }
+
   // ===== Menu Controls =====
   document.querySelectorAll('#playerCountRow .chip').forEach(btn => {
     btn.onclick = () => {
       document.querySelectorAll('#playerCountRow .chip').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       playerCount = parseInt(btn.dataset.count);
+      saveConfig();
       clickSound();
     };
   });
@@ -960,6 +1307,7 @@
       document.querySelectorAll('#botLevelRow .chip').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       botLevel = btn.dataset.level;
+      saveConfig();
       clickSound();
     };
   });
@@ -969,12 +1317,39 @@
     const nameInput = $('playerNameInput').value.trim();
     playerName = nameInput || 'তুমি';
     if (playerName.length > 12) playerName = playerName.substring(0, 12);
+    saveConfig();
 
     showScreen('game');
     setTimeout(() => {
       initGame();
       resizeCanvas();
     }, 100);
+  };
+
+  $('customBtn').onclick = () => {
+    clickSound();
+    buildCustomUI();
+    renderTokenPreview();
+    showScreen('custom');
+  };
+
+  $('customBackBtn').onclick = () => {
+    clickSound();
+    const nameInput = $('playerNameInput').value.trim();
+    playerName = nameInput || 'তুমি';
+    if (playerName.length > 12) playerName = playerName.substring(0, 12);
+    saveConfig();
+
+    showScreen('game');
+    setTimeout(() => {
+      initGame();
+      resizeCanvas();
+    }, 100);
+  };
+
+  $('customMenuBtn').onclick = () => {
+    clickSound();
+    showScreen('menu');
   };
 
   $('howBtn').onclick = () => {
@@ -991,6 +1366,10 @@
       "• Easy — সাধারণ\n" +
       "• Hard — স্মার্ট\n" +
       "• Expert — বুদ্ধিমান\n\n" +
+      "🎨 কাস্টমাইজ:\n" +
+      "• গুটির আকার (5টি)\n" +
+      "• গুটির স্টাইল (4টি)\n" +
+      "• রঙের স্কিম (4টি)\n\n" +
       "🏆 শুভ কামনা!"
     );
   };
@@ -1054,16 +1433,27 @@
     }
   } catch(e) {}
 
-  // ===== Continuous animation for pulse =====
-  setInterval(() => {
-    if (mustMoveToken) draw();
-  }, 100);
-
   // ===== Init =====
+  loadConfig();
+
+  // Apply loaded settings
+  document.getElementById('playerNameInput').value = playerName;
+  document.querySelectorAll('#playerCountRow .chip').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.count) === playerCount);
+  });
+  document.querySelectorAll('#botLevelRow .chip').forEach(b => {
+    b.classList.toggle('active', b.dataset.level === botLevel);
+  });
+
   showScreen('menu');
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
+
+  // Pulse animation for movable tokens
+  setInterval(() => {
+    if (mustMoveToken) draw();
+  }, 100);
 
 })();
