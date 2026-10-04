@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+  <meta name="theme-color" content="#1a0033">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Ludo King">
+  <title>Ludo King - Premium Board Game</title>
+
+  <link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="shortcut icon" href="favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+  <link rel="manifest" href="site.webmanifest" />
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- ===== মেনু স্ক্রিন ===== -->
+  <div id="menuScreen" class="screen">
+    <div class="menu-bg-decor"></div>
+    <h1 class="logo">
+      <span class="logo-ludo">LUDO</span>
+      <span class="logo-king">KING</span>
+    </h1>
+    <p class="subtitle">🎲 PREMIUM BOARD GAME 🎲</p>
+
+    <div class="name-input-group">
+      <label>👤 তোমার নাম</label>
+      <input type="text" id="playerNameInput" maxlength="12" placeholder="Player 1" value="তুমি">
+    </div>
+
+    <div class="menu-group">
+      <label>👥 খেলোয়াড় সংখ্যা</label>
+      <div class="row" id="playerCountRow">
+        <button class="chip" data-count="2">2 জন</button>
+        <button class="chip active" data-count="3">3 জন</button>
+        <button class="chip" data-count="4">4 জন</button>
+      </div>
+    </div>
+
+    <div class="menu-group">
+      <label>🤖 বট এর বুদ্ধি</label>
+      <div class="row" id="botLevelRow">
+        <button class="chip active" data-level="easy">Easy</button>
+        <button class="chip" data-level="hard">Hard</button>
+        <button class="chip" data-level="expert">Expert</button>
+      </div>
+    </div>
+
+    <button class="menu-btn play-btn" id="playBtn">▶ START GAME</button>
+    <button class="menu-btn" id="howBtn">❓ HOW TO PLAY</button>
+  </div>
+
+  <!-- ===== গেম স্ক্রিন ===== -->
+  <div id="gameScreen" class="screen hidden">
+
+    <!-- প্লেয়ার ইন্ডিকেটর টপ -->
+    <div class="players-bar">
+      <div class="player-pill" data-pid="0">
+        <span class="pill-color" style="background:#e63946"></span>
+        <span class="pill-name">তুমি</span>
+      </div>
+      <div class="player-pill" data-pid="1">
+        <span class="pill-color" style="background:#06d6a0"></span>
+        <span class="pill-name">বট 1</span>
+      </div>
+      <div class="player-pill" data-pid="2">
+        <span class="pill-color" style="background:#ffd60a"></span>
+        <span class="pill-name">বট 2</span>
+      </div>
+      <div class="player-pill" data-pid="3">
+        <span class="pill-color" style="background:#4cc9f0"></span>
+        <span class="pill-name">বট 3</span>
+      </div>
+    </div>
+
+    <div class="status-bar">
+      <span id="turnIndicator">🔴 তোমার পালা</span>
+      <span id="statusText" class="status-text hidden"></span>
+    </div>
+
+    <div class="board-wrap">
+      <canvas id="board"></canvas>
+    </div>
+
+    <div class="dice-area">
+      <button class="dice-btn" id="diceBtn">
+        <div class="dice-face" id="diceFace">🎲</div>
+        <div class="dice-label">TAP TO ROLL</div>
+      </button>
+      <button class="menu-btn small" id="backToMenuBtn">◀ মেনু</button>
+    </div>
+  </div>
+
+  <!-- ===== জেতার স্ক্রিন ===== -->
+  <div id="winScreen" class="screen hidden">
+    <div class="win-confetti" id="winConfetti"></div>
+    <h1 class="win-title" id="winTitle">🎉 VICTORY 🎉</h1>
+    <p class="win-subtitle" id="winText">তুমি জিতেছ!</p>
+    <div class="win-stats">
+      <p>🏆 মোট টোকেন হোম: 4</p>
+    </div>
+    <button class="menu-btn play-btn" id="playAgainBtn">▶ আবার খেলো</button>
+    <button class="menu-btn" id="menuBtn">🏠 মেনু</button>
+  </div>
+
+  <!-- ===== ডেভলপার কার্ড ===== -->
+  <div class="developer">
+    <img src="dev.jpg" alt="Molla Mohammad Rifat Osama" class="dev-photo" onerror="this.style.background='linear-gradient(135deg,#ffcc00,#cc8800)'">
+    <div class="dev-info">
+      <p class="dev-name">Molla Mohammad Rifat Osama</p>
+      <p class="dev-role">🎮 Game Developer | PWA Designer</p>
+      <p class="dev-msg">
+        এই লুডু কিং স্টাইলের গেমটি সম্পূর্ণ ব্রাউজারে চলে, অফলাইনে খেলা যায়,
+        এবং অ্যাপ হিসেবে ইনস্টল করা যায়। ধন্যবাদ খেলার জন্য! ❤️
+      </p>
+      <div class="dev-tags">
+        <span>💻 HTML5</span>
+        <span>🎨 Canvas</span>
+        <span>⚡ JavaScript</span>
+        <span>📱 PWA</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<button id="installBtn" class="install-btn hidden">📲 Install App</button>
+
+<script src="script.js"></script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('✅ SW:', reg.scope))
+        .catch(err => console.log('❌ SW:', err));
+    });
+  }
+</script>
+
+</body>
+</html>
