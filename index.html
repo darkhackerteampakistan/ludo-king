@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Ludo King">
-  <title>Ludo King - Premium Board Game</title>
+  <title>Ludo King Ultimate</title>
 
   <link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
@@ -25,19 +25,20 @@
   <!-- ===== মেনু স্ক্রিন ===== -->
   <div id="menuScreen" class="screen">
     <div class="menu-bg-decor"></div>
+
     <h1 class="logo">
       <span class="logo-ludo">LUDO</span>
       <span class="logo-king">KING</span>
     </h1>
-    <p class="subtitle">🎲 PREMIUM BOARD GAME 🎲</p>
+    <p class="subtitle">👑 ULTIMATE EDITION 👑</p>
 
     <div class="name-input-group">
       <label>👤 তোমার নাম</label>
-      <input type="text" id="playerNameInput" maxlength="12" placeholder="Player 1" value="তুমি">
+      <input type="text" id="playerNameInput" maxlength="12" placeholder="তোমার নাম" value="তুমি">
     </div>
 
     <div class="menu-group">
-      <label>👥 খেলোয়াড় সংখ্যা</label>
+      <label>👥 খেলোয়াড়</label>
       <div class="row" id="playerCountRow">
         <button class="chip" data-count="2">2 জন</button>
         <button class="chip active" data-count="3">3 জন</button>
@@ -55,13 +56,49 @@
     </div>
 
     <button class="menu-btn play-btn" id="playBtn">▶ START GAME</button>
+    <button class="menu-btn" id="customBtn">🎨 CUSTOMIZE TOKENS</button>
     <button class="menu-btn" id="howBtn">❓ HOW TO PLAY</button>
+  </div>
+
+  <!-- ===== কাস্টমাইজ স্ক্রিন ===== -->
+  <div id="customScreen" class="screen hidden">
+    <h2 class="title">🎨 CUSTOMIZE TOKENS</h2>
+    <p class="subtitle-small">তোমার গুটি সাজাও</p>
+
+    <!-- Token Shape -->
+    <div class="section">
+      <label>🔷 গুটির আকার</label>
+      <p class="hint">গুটি কেমন দেখাবে</p>
+      <div class="row" id="shapeRow"></div>
+    </div>
+
+    <!-- Token Style -->
+    <div class="section">
+      <label>✨ গুটির স্টাইল</label>
+      <p class="hint">3D লুক কেমন হবে</p>
+      <div class="row" id="styleRow"></div>
+    </div>
+
+    <!-- Color Scheme -->
+    <div class="section">
+      <label>🎨 রঙের স্কিম</label>
+      <p class="hint">৪টি প্লেয়ারের রঙ</p>
+      <div class="row" id="colorRow"></div>
+    </div>
+
+    <!-- Preview -->
+    <div class="section">
+      <label>👁️ প্রিভিউ</label>
+      <canvas id="tokenPreview" width="300" height="80"></canvas>
+    </div>
+
+    <button class="menu-btn play-btn" id="customBackBtn">▶ PLAY NOW</button>
+    <button class="menu-btn" id="customMenuBtn">◀ BACK</button>
   </div>
 
   <!-- ===== গেম স্ক্রিন ===== -->
   <div id="gameScreen" class="screen hidden">
 
-    <!-- প্লেয়ার ইন্ডিকেটর টপ -->
     <div class="players-bar">
       <div class="player-pill" data-pid="0">
         <span class="pill-color" style="background:#e63946"></span>
@@ -99,13 +136,13 @@
     </div>
   </div>
 
-  <!-- ===== জেতার স্ক্রিন ===== -->
+  <!-- ===== Win Screen ===== -->
   <div id="winScreen" class="screen hidden">
     <div class="win-confetti" id="winConfetti"></div>
     <h1 class="win-title" id="winTitle">🎉 VICTORY 🎉</h1>
     <p class="win-subtitle" id="winText">তুমি জিতেছ!</p>
-    <div class="win-stats">
-      <p>🏆 মোট টোকেন হোম: 4</p>
+    <div class="win-stats" id="winStats">
+      <p>🏆 মোট 4 টোকেন হোম</p>
     </div>
     <button class="menu-btn play-btn" id="playAgainBtn">▶ আবার খেলো</button>
     <button class="menu-btn" id="menuBtn">🏠 মেনু</button>
@@ -118,12 +155,12 @@
       <p class="dev-name">Molla Mohammad Rifat Osama</p>
       <p class="dev-role">🎮 Game Developer | PWA Designer</p>
       <p class="dev-msg">
-        এই লুডু কিং স্টাইলের গেমটি সম্পূর্ণ ব্রাউজারে চলে, অফলাইনে খেলা যায়,
-        এবং অ্যাপ হিসেবে ইনস্টল করা যায়। ধন্যবাদ খেলার জন্য! ❤️
+        Ludo King Ultimate — সম্পূর্ণ অফলাইন, ইনস্টলেবল, বন্ধুদের সাথে
+        একই ফোনে খেলা যায়, AI বট সহ। ধন্যবাদ খেলার জন্য! ❤️
       </p>
       <div class="dev-tags">
         <span>💻 HTML5</span>
-        <span>🎨 Canvas</span>
+        <span>🎨 Canvas 2D</span>
         <span>⚡ JavaScript</span>
         <span>📱 PWA</span>
       </div>
