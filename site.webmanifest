@@ -1,7 +1,7 @@
 {
-  "name": "Ludo King Premium",
+  "name": "Ludo King Ultimate",
   "short_name": "Ludo King",
-  "description": "Premium Ludo board game - play offline!",
+  "description": "Premium Ludo board game - 100% offline!",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
